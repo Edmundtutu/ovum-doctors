@@ -1,0 +1,400 @@
+/* Color Variables */
+:root {
+    --primary-color: #FFC0CB;
+    --blend-primary-color: #fff0ff;
+    --secondary-color: #ff99cc;
+    --success-color: #8bc34a;
+    --complementary-color: #3498db;
+    --warning-color: #ff9900;
+    --error-color: #ff3737;
+    --triadic-color: #8e44ad;
+    --soft-orange-color: #ffd7be;
+    --golden-color: #f1c40f;
+}
+
+/* Utility Classes */
+.bg-primary-custom { background-color: var(--primary-color) !important; }
+.bg-secondary-custom { background-color: var(--secondary-color) !important; }
+.bg-success-custom { background-color: var(--success-color) !important; }
+.bg-warning-custom { background-color: var(--warning-color) !important; }
+.bg-error-custom { background-color: var(--error-color) !important; }
+
+.text-primary-custom { color: var(--primary-color) !important; }
+.text-secondary-custom { color: var(--secondary-color) !important; }
+.text-success-custom { color: var(--success-color) !important; }
+.text-warning-custom { color: var(--warning-color) !important; }
+.text-error-custom { color: var(--error-color) !important; }
+.text-muted-custom{color:var(--triadic-color) !important;}
+
+/* Soft Background Colors */
+.bg-soft-primary { background: rgba(13, 110, 253, 0.1); }
+.bg-soft-success { background: rgba(25, 135, 84, 0.1); }
+.bg-soft-warning { background: rgba(255, 193, 7, 0.1); }
+.bg-soft-danger { background: rgba(220, 53, 69, 0.1); }
+
+/* Text Background Colors */
+.text-bg-primary-custom {
+    color: #fff !important;
+    background-color: var(--primary-color) !important;
+}
+
+.text-bg-secondary-custom {
+    color: #fff !important;
+    background-color: var(--secondary-color) !important;
+}
+
+.text-bg-success-custom {
+    color: #fff !important;
+    background-color: var(--success-color) !important;
+}
+
+.text-bg-warning-custom {
+    color: #000 !important;
+    background-color: var(--warning-color) !important;
+}
+
+.text-bg-error-custom {
+    color: #fff !important;
+    background-color: var(--error-color) !important;
+}
+
+.text-bg-triadic-custom {
+    color: #fff !important;
+    background-color: var(--triadic-color) !important;
+}
+
+/* Soft Text Background Colors */
+.text-bg-primary-custom-soft {
+    color: var(--primary-color) !important;
+    background-color: var(--blend-primary-color) !important;
+}
+
+.text-bg-secondary-custom-soft {
+    color: var(--secondary-color) !important;
+    background-color: rgba(255, 153, 204, 0.1) !important;
+}
+
+.text-bg-success-custom-soft {
+    color: var(--success-color) !important;
+    background-color: rgba(139, 195, 74, 0.1) !important;
+}
+
+.text-bg-warning-custom-soft {
+    color: var(--warning-color) !important;
+    background-color: rgba(255, 153, 0, 0.1) !important;
+}
+
+.text-bg-error-custom-soft {
+    color: var(--error-color) !important;
+    background-color: rgba(255, 55, 55, 0.1) !important;
+}
+
+.text-bg-triadic-custom-soft {
+    color: var(--triadic-color) !important;
+    background-color: rgba(142, 68, 173, 0.1) !important;
+}
+
+
+/* Custom Button Styles */
+
+.btn-custom-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-custom-primary:hover {
+    background-color: var(--blend-primary-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Toast Notifications */
+.toast {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: none;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.toast-success { border-left: 4px solid var(--success-color); }
+.toast-error { border-left: 4px solid var(--error-color); }
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #858796;
+    background: #f8f9fc;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Top Navigation Styles */
+.top-nav {
+    background: var(--secondary-color);
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.top-nav .logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.top-nav .headings h2 {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+.top-nav .headings h3 {
+    font-size: 0.9rem;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background: linear-gradient(180deg, var(--blend-primary-color) 0%, #fff0ff 100%);
+    min-height: calc(100vh - 56px);
+    width: 200px;
+    padding: 1rem;
+    position: fixed;
+}
+
+.sidebar h4 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar .nav-link {
+    background-color: #fafafa;
+    color: #444; 
+    margin-bottom: .25rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: .25rem;
+    font-size: 0.9rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #FFC0CB;
+    background: rgba(255, 255, 255, .1);
+}
+
+/* Main Content Styles */
+.main-content {
+    padding: 1.5rem;
+    background-color: #f8f9fc;
+    margin-left: 16.666667%
+}
+
+.welcome-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Stats Card Styles */
+.stats-card {
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.stats-card .card-body {
+    padding: 1rem;
+}
+
+.stats-card .card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.stats-card .card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .card-text {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+/* Calendar Container */
+.calendar-container {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 100%;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.calendar-container h5 {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.responsive-calendar {
+    height: calc(100% - 3rem) !important;
+    min-height: 400px;
+}
+
+/* Patient List */
+.patient-list {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 100%;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.patient-list h5 {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.list-group-item {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.list-group-item h6 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.list-group-item p {
+    font-size: 0.8125rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.list-group-item small {
+    font-size: 0.75rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+        margin-left: 0;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    
+    .calendar-container,
+    .patient-list {
+        margin-bottom: 1rem;
+    }
+    
+    .responsive-calendar {
+        min-height: 300px;
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: static;
+        top: 56px;
+        left: -100%;
+        height: calc(100vh - 56px);
+        min-height: auto;
+        margin-bottom: 20px;
+        z-index: 1000;
+        transition: left 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .col-md-10 {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Button size adjustments */
+.btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Toast adjustments */
+.toast {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+/* Status badge adjustments */
+.status-badge {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    border-radius: 12px;
+}
+
+/* Add more utility classes as needed */ 

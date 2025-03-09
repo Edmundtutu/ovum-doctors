@@ -1,0 +1,451 @@
+:root {
+    --primary-color:#FFC0CB;   /*#4e73df*/
+    --blend-primary-color:#fff0ff;
+    --secondary-color: #ff99cc; /*#858796;*/
+    --success-color: #8bc34a;
+    --complementary-color: #3498db;
+    --warning-color: #ff9900;
+    --error-color:#ff3737;
+    --triadic-color: #8e44ad;
+    --soft-orange-color: #ffd7be;
+    --golden-color:#f1c40f;
+}
+
+/* Base Styles */
+html {
+    font-size: 14px; /* Base font size reduction */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #858796;
+    background: #f8f9fc;
+    overflow-y: auto;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Smaller font sizes for headings */
+h1, .h1 { font-size: 1.75rem; }
+h2, .h2 { font-size: 1.5rem; }
+h3, .h3 { font-size: 1.25rem; }
+h4, .h4 { font-size: 1.15rem; }
+h5, .h5 { font-size: 1rem; }
+h6, .h6 { font-size: 0.9rem; }
+
+/* Navigation Components */
+.top-nav {
+    background: var(--secondary-color);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.top-nav .logo img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.top-nav .headings {
+    text-align: left;
+}
+
+.top-nav .headings h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--blend-primary-color);
+    margin-bottom: 2px;
+}
+
+.top-nav .headings h3 {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 400;
+    margin: 0;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.top-nav nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-nav nav a {
+    color: var(--blend-primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.top-nav nav a:hover,
+.top-nav nav a.active {
+    color: var(--primary-color);
+}
+
+.top-nav #logout {
+    padding: 4px 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.top-nav #logout:hover {
+    background: var(--soft-orange-color);
+}
+
+.top-nav .hamburger {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--blend-primary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Modal bars styling */
+.modalbar{
+    background-color: var(--primary-color);
+}
+/* Sidebar Component */
+.sidebar {
+    background: linear-gradient(180deg, var(--blend-primary-color) 0%, #fff0ff 100%);
+    min-height: 100vh;
+}
+
+.sidebar h4 {
+    color: var(--primary-color);
+}
+
+.sidebar .nav-link {
+    background-color: #fafafa;
+    color: #444; 
+    margin-bottom: .5rem;
+    padding: 1rem;
+    border-radius: .5rem;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: var(--primary-color);
+    background: rgba(255, 255, 255, .1);
+}
+
+/* Card Components */
+.stats-card {
+    border: none;
+    border-radius: 1rem;
+    transition: transform 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.vital-card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.vital-card:hover {
+    transform: translateY(-5px);
+}
+
+.vital-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* Calendar Component */
+.calendar-container {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.responsive-calendar {
+    width: 100%;
+    height: auto !important;
+    min-height: 600px;
+}
+
+/* FullCalendar Customization */
+.fc {
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    font-size: 0.9rem;
+}
+
+.fc td, 
+.fc th {
+    padding: 4px !important;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.fc .fc-button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+}
+
+.fc .fc-daygrid-day-number {
+    font-size: 0.9rem;
+    width: 24px;
+    height: 24px;
+}
+
+/* Apointment View styel  */
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Patient List Component */
+.patient-list {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.list-group-item {
+    border: none;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+    .top-nav nav {
+        display: none;
+    }
+
+    .top-nav .hamburger {
+        display: block;
+    }
+
+    .top-nav.active nav {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: var(--secondary-color);
+        padding: 12px 16px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .top-nav.active nav a {
+        margin: 4px 0;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 56px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 56px);
+        z-index: 1000;
+        transition: left 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+}
+
+.verification-step {
+    transition: all 0.3s ease;
+}
+
+.otp-input-container {
+    margin: 15px 0;
+}
+
+.otp-input {
+    font-size: 24px;
+    letter-spacing: 5px;
+    text-align: center;
+}
+
+/* Responsive Top Navigation */
+@media (max-width: 767.98px) {
+    .top-nav {
+        padding: 8px 10px;
+        height: 46px;
+        overflow: hidden;
+        transition: height 0.3s ease;
+    }
+    
+    .top-nav.active {
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .logo-section {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 15px;
+        align-items: flex-start;
+        display: none;
+    }
+    
+    .top-nav.active .nav-links {
+        display: flex;
+    }
+    
+    .top-nav nav {
+        flex-direction: column;
+        width: 100%;
+        gap: 5px;
+        align-items: flex-start;
+    }
+    
+    .top-nav nav a {
+        width: 100%;
+        padding: 8px 0;
+    }
+    
+    .hamburger {
+        display: block;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+    
+    #logout {
+        margin-top: 10px;
+        width: 100%;
+        text-align: left;
+    }
+}
+
+/* Make sure hamburger is displayed on mobile */
+@media (min-width: 768px) {
+    .hamburger {
+        display: none;
+    }
+}
+
+/* Update z-index value for top nav */
+.top-nav {
+    z-index: 999;
+}
+
+/* Buttons & Form Elements */
+.btn {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+}
+
+.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-lg {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.form-control {
+    font-size: 0.9rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+}
+
+.card-title {
+    font-size: 1.1rem;
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+}
+
+/* Stats cards */
+.stats-card .card-title {
+    font-size: 1.5rem;
+}
+
+.stats-card .card-subtitle {
+    font-size: 0.8rem;
+}
+
+.stats-card .card-text {
+    font-size: 0.8rem;
+} 
