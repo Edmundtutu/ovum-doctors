@@ -20,4 +20,5 @@ Route::prefix('twilio')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('cycle-histories', [CyleHistoryController::class, 'apiStore']);
     // Other API routes for mobile app...
+    Route::get('cycle-histories', [CyleHistoryController::class, 'getMyCycles']);
 });

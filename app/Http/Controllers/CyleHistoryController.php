@@ -37,4 +37,19 @@ class CyleHistoryController extends Controller
             'message' => 'This endpoint is reserved for the mobile application'
         ], 403);
     }
+
+    /**
+     * Display cycle history data for authenticated user.
+     * This is for the patient's mobile app.
+     */
+    public function getMyCycles(Request $request): JsonResponse
+    {
+        $cycleHistory = DB::table('cyle_histories')
+            ->where('patient_id', auth()->id())
+            ->select(['month', 'cycle_length', 'period_length', 'symptoms'])
+            ->orderBy('month')
+            ->get();
+
+        return response()->json($cycleHistory);
+    }
 }
