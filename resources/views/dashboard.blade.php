@@ -91,7 +91,7 @@
             <div class="patient-list">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Today's Patients</h5>
-                    <a href="{{ route('appointments.today') }}" class="btn btn-link btn-sm p-0">View All</a>
+                    <a href="#" class="btn btn-link btn-sm p-0">View All</a>
                 </div>
                 <div class="list-group patient-appointments-list">
                     @foreach ($todayPatients as $patient)
@@ -171,15 +171,16 @@
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right:'none'
+                    right: 'none'
                 },
+                timeZone: 'local',
                 handleWindowResize: true,
                 expandRows: true,
                 stickyHeaderDates: true,
                 editable: true,
                 selectable: true,
                 selectMirror: true,
-                dayMaxEvents: 1, // Limit visible events per day and show +more link
+                dayMaxEvents: 1,
                 scrollTime: '00:00',
                 slotDuration: '00:30:00',
                 firstDay: 1,
@@ -199,42 +200,11 @@
                 },
                 events: @json($calendarEvents),
                 select: function(info) {
+                    // Set the selected date in the form
+                    $('#appointment_date').val(info.startStr);
+                    
+                    // Show the modal
                     $('#createAppointmentModal').modal('show');
-                    $('#createAppointmentForm').on('submit', function(e) {
-                        e.preventDefault();
-
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            method: 'POST',
-                            data: $(this).serialize(),
-                            success: function(response) {
-                                if (response.success) {
-                                    // Add the new event to the calendar
-                                    calendar.addEvent(response.event);
-
-                                    // Update modal content
-                                    $('#appointmentModalContent').html(response
-                                        .modalContent);
-
-                                    // Hide create modal and show details modal
-                                    $('#createAppointmentModal').modal('hide');
-                                    $('#appointmentModal').modal('show');
-
-                                    // Optional: Clear the form
-                                    $('#createAppointmentForm')[0].reset();
-                                }
-                            },
-                            error: function(xhr) {
-                                // Handle errors (show validation messages, etc.)
-                                if (xhr.status === 422) {
-                                    let errors = xhr.responseJSON;
-                                    // Display errors to user
-                                    alert(errors.message ||
-                                        'Error creating appointment');
-                                }
-                            }
-                        });
-                    });
                 },
                 eventClick: function(info) {
                     loadAppointmentDetails(info.event.id);
@@ -253,6 +223,9 @@
                 }
             });
 
+            // Expose calendar to window scope so other scripts can access it
+            window.calendar = calendar;
+            
             calendar.render();
 
             // Set active class for the selected view

@@ -51,68 +51,84 @@ class AppointmentController extends Controller
      */
     public function store(Request $request): RedirectResponse|JsonResponse
     {
-        $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'appointment_date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'type' => 'required|string|max:50',
-            'reason' => 'required|string|max:500',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        try {
+            $validated = $request->validate([
+                'patient_id' => 'required|exists:patients,id',
+                'appointment_date' => 'required|date|after_or_equal:today',
+                'start_time' => 'required|date_format:H:i',
+                'end_time' => 'required|date_format:H:i|after:start_time',
+                'type' => 'required|string|max:50',
+                'reason' => 'required|string|max:500',
+                'notes' => 'nullable|string|max:1000',
+            ]);
 
-        // Check for conflicting appointments
-        $conflicts = $this->checkForConflicts(
-            $validated['appointment_date'],
-            $validated['start_time'],
-            $validated['end_time']
-        );
+            // Check for conflicting appointments
+            $conflicts = $this->checkForConflicts(
+                $validated['appointment_date'],
+                $validated['start_time'],
+                $validated['end_time']
+            );
 
-        if ($conflicts) {
+            if ($conflicts) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This time slot conflicts with an existing appointment.'
+                    ], 422);
+                }
+
+                return back()
+                    ->withInput()
+                    ->withErrors(['conflict' => 'This time slot conflicts with an existing appointment.']);
+            }
+
+            $appointment = Appointment::create(array_merge(
+                $validated,
+                [
+                    'doctor_id' => auth()->guard('doctor')->id(),
+                    'status' => 'scheduled'
+                ]
+            ));
+
+            $appointment->load(['patient', 'doctor']);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Appointment created successfully',
+                    'event' => [
+                        'id' => $appointment->id,
+                        'title' => $appointment->patient->name,
+                        'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->start_time->format('H:i:s'),
+                        'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->end_time->format('H:i:s'),
+                        'allDay' => false
+                    ],
+                    'modalContent' => view('appointments.partials.show-modal-content', compact('appointment'))->render(),
+                    'redirect' => route('appointments.index')
+                ]);
+            }
+
+            return redirect()
+                ->route('appointments.index')
+                ->with('success', 'Appointment created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'This time slot conflicts with an existing appointment.'
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
                 ], 422);
             }
-
-            return back()
-                ->withInput()
-                ->withErrors(['conflict' => 'This time slot conflicts with an existing appointment.']);
+            throw $e;
+        } catch (\Exception $e) {            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred: ' . $e->getMessage()
+                ], 500);
+            }
+            throw $e;
         }
-
-        $appointment = Appointment::create(array_merge(
-            $validated,
-            [
-                'doctor_id' => auth()->guard('doctor')->id(),
-                'status' => 'scheduled'
-            ]
-        ));
-
-        // Load the relationships
-        $appointment->load(['patient', 'doctor']);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment created successfully',
-                'appointment' => $appointment,
-                // Add calendar event data
-                'event' => [
-                    'id' => $appointment->id,
-                    'title' => $appointment->patient->name, // or whatever you want to show
-                    'start' => $appointment->appointment_date . 'T' . $appointment->start_time,
-                    'end' => $appointment->appointment_date . 'T' . $appointment->end_time,
-                ],
-                // Include the rendered modal content
-                'modalContent' => view('appointments.partials.show-modal-content', compact('appointment'))->render()
-            ]);
-        }
-
-        // For non-AJAX requests, redirect back to calendar
-        return redirect()
-            ->route('appointments.index')
-            ->with('success', 'Appointment created successfully.');
     }
 
     /**
@@ -137,58 +153,104 @@ class AppointmentController extends Controller
     public function edit(Appointment $appointment): View
     {
         $patients = Patient::orderBy('name')->get(['id', 'name']);
+        
+        // If it's an AJAX request, return just the form content
+        if (request()->ajax()) {
+            return view('appointments.partials.edit-modal-content', compact('appointment', 'patients'));
+        }
+        
+        // Otherwise return the full edit page
         return view('appointments.edit', compact('appointment', 'patients'));
     }
 
     /**
      * Update the specified appointment.
      */
-    public function update(Request $request, Appointment $appointment): RedirectResponse
+    public function update(Request $request, Appointment $appointment): RedirectResponse|JsonResponse
     {
-        $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'appointment_date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'type' => 'required|string|max:50',
-            'reason' => 'nullable|string|max:500',
-            'notes' => 'nullable|string|max:1000',
-            'status' => 'required|in:pending,confirmed,completed,cancelled'
-        ]);
-
-        // Check for conflicting appointments (excluding this appointment)
-        $conflicts = $this->checkForConflicts(
-            $validated['appointment_date'],
-            $validated['start_time'],
-            $validated['end_time'],
-            $appointment->id
-        );
-
-        if ($conflicts) {
-            return back()
-                ->withInput()
-                ->withErrors(['conflict' => 'This time slot conflicts with an existing appointment.']);
-        }
-
-        $appointment->update($validated);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment updated successfully',
-                'appointment' => $appointment->fresh(['patient', 'doctor'])
+        try {   
+            $validated = $request->validate([
+                'patient_id' => 'required|exists:patients,id',
+                'appointment_date' => 'required|date|after_or_equal:today',
+                'start_time' => 'required|date_format:H:i',
+                'end_time' => 'required|date_format:H:i|after:start_time',
+                'type' => 'required|string|max:50',
+                'reason' => 'nullable|string|max:500',
+                'notes' => 'nullable|string|max:1000',
+                'status' => 'required|in:pending,confirmed,completed,cancelled'
             ]);
-        }
 
-        return redirect()
-            ->route('appointments.show', $appointment)
-            ->with('success', 'Appointment updated successfully.');
+            // Check for conflicting appointments (excluding this appointment)
+            $conflicts = $this->checkForConflicts(
+                $validated['appointment_date'],
+                $validated['start_time'],
+                $validated['end_time'],
+                $appointment->id
+            );
+
+            if ($conflicts) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This time slot conflicts with an existing appointment.'
+                    ], 422);
+                }
+                
+                return back()
+                    ->withInput()
+                    ->withErrors(['conflict' => 'This time slot conflicts with an existing appointment.']);
+            }
+
+            $appointment->update($validated);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Appointment updated successfully',
+                    'appointment' => $appointment->fresh(['patient', 'doctor']),
+                    'event' => [
+                        'id' => $appointment->id,
+                        'title' => $appointment->patient->name,
+                        'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->start_time->format('H:i:s'),
+                        'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->end_time->format('H:i:s'),
+                        'allDay' => false
+                    ],
+                    'debug' => [
+                        'is_ajax' => $request->ajax(),
+                        'wants_json' => $request->wantsJson(),
+                        'accepts_json' => $request->acceptsJson(),
+                        'request_path' => $request->path(),
+                    ]
+                ]);
+            }
+
+            return redirect()
+                ->route('appointments.show', $appointment)
+                ->with('success', 'Appointment updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred: ' . $e->getMessage()
+                ], 500);
+            }
+            throw $e;
+        }
     }
 
     /**
      * Remove the specified appointment.
      */
-    public function destroy(Appointment $appointment): RedirectResponse
+    public function destroy(Appointment $appointment): RedirectResponse|JsonResponse
     {
         $appointment->delete();
 
