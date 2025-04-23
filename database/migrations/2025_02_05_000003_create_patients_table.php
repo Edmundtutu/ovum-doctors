@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('blood_type')->nullable();
             $table->string('emergency_contact');
             $table->string('emergency_phone');
+            $table->string('passcode', 60)->nullable();
             $table->timestamps();
         });
     }
