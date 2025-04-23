@@ -38,12 +38,26 @@ class DatabaseSeeder extends Seeder
         for ($i = 0; $i < 5; $i++) {
             $doctor = $doctors->random(); // Randomly assign to one of the doctors
             $patients->push(
-                Patient::factory()->create([
-                    'doctor_id' => $doctor->id,
-                    'email' => "patient{$i}@example.com"
-                ])
+                Patient::factory()
+                    ->withPasscode('0000') // Add standard test passcode
+                    ->create([
+                        'doctor_id' => $doctor->id,
+                        'email' => "patient{$i}@example.com"
+                    ])
             );
         }
+
+        // Create one special test patient with known details
+        $patients->push(
+            Patient::factory()
+                ->withPasscode('0000')
+                ->create([
+                    'doctor_id' => $doctors->first()->id,
+                    'name' => 'Test Patient',
+                    'email' => 'patient@example.com',
+                    'phone' => '1234567890'
+                ])
+        );
 
         // Create vitals records for each patient
         foreach ($patients as $patient) {

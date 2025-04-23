@@ -8,7 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\VisitController;
-use App\Http\Controllers\CyleHistoryController;
+use App\Http\Controllers\APi\CyleHistoryController;
 
 
 
@@ -35,7 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/patients/{patient}/verify', [PatientController::class, 'showVerificationForm'])->name('patient.verify.form');
     Route::post('/patient-access/request', [LoginController::class, 'requestPatientAccess'])->name('patient.access.request');
     Route::post('/patient-access/verify', [LoginController::class, 'verifyPatientAccess'])->name('patient.access.verify');
+    Route::get('patients/{patient}/appointments', [AppointmentController::class, 'getPatientAppointments'])->name('patients.appointments');
     Route::resource('visits', VisitController::class);
     Route::get('patients/{patient}/cycle-history', [CyleHistoryController::class, 'forPatient'])
         ->name('patients.cycle-history');
 }); 
+

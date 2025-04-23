@@ -182,85 +182,57 @@ body {
     font-size: 0.9rem;
 }
 
-/* Sidebar Styles */
-.sidebar {
-    background: linear-gradient(180deg, var(--blend-primary-color) 0%, #fff0ff 100%);
-    min-height: calc(100vh - 56px);
-    width: 200px;
-    padding: 1rem;
-    position: fixed;
-}
-
-.sidebar h4 {
-    color: var(--primary-color);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.sidebar .nav-link {
-    background-color: #fafafa;
-    color: #444; 
-    margin-bottom: .25rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: .25rem;
-    font-size: 0.9rem;
-}
-
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-    color: #FFC0CB;
-    background: rgba(255, 255, 255, .1);
-}
-
-/* Main Content Styles */
-.main-content {
-    padding: 1.5rem;
-    background-color: #f8f9fc;
-    margin-left: 16.666667%
-}
-
-.welcome-text {
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin: 0;
-}
-
-.action-buttons .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-/* Stats Card Styles */
-.stats-card {
-    height: 100%;
+/* 1) Responsive grid */
+.stats-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 2) Base card look + hover */
+  .stats-card {
+    position: relative;
+    overflow: hidden;
     border: none;
-    border-radius: 0.5rem;
-    transition: transform 0.2s;
-}
-
-.stats-card .card-body {
-    padding: 1rem;
-}
-
-.stats-card .card-subtitle {
-    font-size: 0.875rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  
+  /* 3) Inner padding & typography */
+  .stats-card .card-body {
+    padding: 1.25rem;
+  }
+  .stats-card .card-subtitle {
+    font-size: 0.85rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
-    opacity: 0.9;
-}
-
-.stats-card .card-title {
-    font-size: 1.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.4rem;
+  }
+  .stats-card .card-title {
+    font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.stats-card .card-text {
-    font-size: 0.875rem;
-    margin-bottom: 0;
-    opacity: 0.9;
-}
+    margin-bottom: 0.6rem;
+  }
+  .stats-card .card-text {
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+  
+  /* 4) Ghost corner icon */
+  .corner-icon {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    font-size: 3.5rem;
+    opacity: 0.15;
+    pointer-events: none;
+  }
 
 /* Calendar Container */
 .calendar-container {
@@ -398,3 +370,12 @@ body {
 }
 
 /* Add more utility classes as needed */ 
+/* 5) Gradient backgrounds */
+.bg-danger  { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.bg-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
+.bg-success { background: linear-gradient(135deg, #28a745, #1e7e34); }
+.bg-warning { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.bg-info    { background: linear-gradient(135deg, #17a2b8, #117a8b); }
+/* custom teal & purple */
+.bg-teal    { background: linear-gradient(135deg, #20c997, #17a2b8); }
+.bg-purple  { background: linear-gradient(135deg, #6f42c1, #572d96); }

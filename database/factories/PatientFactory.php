@@ -41,6 +41,31 @@ class PatientFactory extends Factory
             'blood_type' => fake()->randomElement($blood_types),
             'emergency_contact' => fake()->name(),
             'emergency_phone' => fake()->phoneNumber(),
+            'passcode' => (string) fake()->numberBetween(1000, 999999), // Random 4-6 digit passcode
         ];
+    }
+    
+    /**
+     * Create a patient with no passcode
+     */
+    public function withoutPasscode()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'passcode' => null,
+            ];
+        });
+    }
+    
+    /**
+     * Create a patient with a specific passcode
+     */
+    public function withPasscode(string $passcode)
+    {
+        return $this->state(function (array $attributes) use ($passcode) {
+            return [
+                'passcode' => $passcode,
+            ];
+        });
     }
 }

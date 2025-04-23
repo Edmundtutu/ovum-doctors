@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Patient;
 use App\Models\Visit;
 use App\Models\Vitals;
-use Illuminate\Http\Request;
+use App\Models\Patient;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
+use App\Models\CyleHistory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\Auth\LoginController;
 
 class PatientController extends Controller
@@ -48,11 +50,19 @@ class PatientController extends Controller
             'blood_type' => 'nullable|string|max:5',
             'emergency_contact' => 'required|string|max:255',
             'emergency_phone' => 'required|string|max:20',
+            'passcode' => [
+                'nullable',
+                'string',
+                'min:4',
+                'max:6',
+                'regex:/^[0-9]+$/' // Only allow numeric characters
+            ],
         ]);
 
         $patient = Patient::create(array_merge(
             $validated,
-            ['doctor_id' => auth()->user()->id]
+            ['doctor_id' => auth()->guard('doctor')->user()->id],
+            ['passcode' => isset($validatedData['passcode']) ? Hash::make($validatedData['passcode']) : null],
         ));
 
         // Record initial vitals if provided
@@ -81,41 +91,57 @@ class PatientController extends Controller
             return redirect()->route('patient.verify.form', $patient);
         }
 
-        $patient->load([
-            'doctor',
-            'latest_vitals',
-            'current_medications',
-            'recent_visits' => function($query) {
-                $query->with('doctor')->latest();
-            },
-            'appointments' => function($query) {
-                $query->upcoming()->with('doctor');
-            }
-        ]);
 
-        // Get vitals history for charts
-        $vitalsHistory = $patient->vitals()
-            ->select(['recorded_at', 'heart_rate', 'weight'])
-            ->latest()
-            ->limit(12)
-            ->get()
-            ->map(function($vital) {
-                return [
-                    'date' => $vital->recorded_at->format('Y-m-d'),
-                    'heart_rate' => $vital->heart_rate,
-                    'weight' => $vital->weight
-                ];
-            });
+        try {
+            $patient->load([
+                'doctor',
+                'latest_vitals',
+                'current_medications',
+                'recent_visits' => function($query) {
+                    $query->with('doctor')->latest()->limit(5);
+                },
+                'appointments' => function($query) {
+                    $query->upcoming()->with('doctor');
+                }
+            ]);
 
-        // Get cycle history for charts
-        $cycleHistory = DB::table('cyle_histories')
-            ->where('patient_id', $patient->id)
-            ->select(['month', 'cycle_length', 'period_length'])
-            ->orderBy('month')
-            ->limit(12)
-            ->get();
+            // Get vitals history for charts
+            $vitalsHistory = $patient->vitals()
+                ->select(['recorded_at', 'heart_rate', 'weight'])
+                ->latest()
+                ->limit(12)
+                ->get()
+                ->map(function($vital) {
+                    return [
+                        'date' => $vital->recorded_at->format('Y-m-d'),
+                        'heart_rate' => $vital->heart_rate,
+                        'weight' => $vital->weight
+                    ];
+                });
 
-        return view('patients.show', compact('patient', 'vitalsHistory', 'cycleHistory'));
+            // Get cycle history for charts using the model 
+            // Althought this is supposed to be an api call 
+            // to run the forPatient() function In the CycleHistoriesController
+            // but for testing lets first stick to this and see
+            $cycleHistory = CyleHistory::where('patient_id', $patient->id)
+                ->latest('month')
+                ->limit(12)
+                ->get()
+                ->map(function($history) {
+                    return [
+                        'month' => $history->month->format('M'),
+                        'cycle_length' => $history->cycle_length,
+                        'period_length' => $history->period_length,
+                        'symptoms' => $history->symptoms
+                    ];
+                });
+            // dd($patient,$vitalsHistory,$cycleHistory);
+            return view('patients.show', compact('patient', 'vitalsHistory', 'cycleHistory'));
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('patients.index')
+                ->with('error', 'Error loading patient data: ' . $e->getMessage());
+        }
     }
 
     /**

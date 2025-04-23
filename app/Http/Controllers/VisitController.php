@@ -37,7 +37,7 @@ class VisitController extends Controller
             'diagnosis' => 'nullable|string',
             'treatment' => 'nullable|string',
             'notes' => 'nullable|string',
-            'follow_up' => 'nullable|string',
+            'follow_up' => 'nullable|date_format:Y-m-d',
         ]);
 
         // Create the visit

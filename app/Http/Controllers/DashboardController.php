@@ -19,6 +19,9 @@ class DashboardController extends Controller
             // Today's appointments count
             'todayAppointments' => Appointment::today()->count(),
             
+            // Total appointments count
+            'totalAppointments' => Appointment::count(),
+            
             // Appointment increase percentage (compared to last week)
             'appointmentIncrease' => $this->calculateAppointmentIncrease(),
             
@@ -49,6 +52,14 @@ class DashboardController extends Controller
             })->with(['appointments' => function($query) {
                 $query->today();
             }])->get(),
+
+            // Total Patients today
+            'totalPatientsToday' => Patient::whereHas('appointments', function($query) {
+                $query->today();
+            })->count(),
+
+            // Total Visits today
+            'totalVisitsToday' => Visit::whereDate('created_at', now())->count(),
             
             // Calendar events
             'calendarEvents' => $this->getCalendarEvents(),

@@ -148,6 +148,54 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Fetch all appointments for a particular patient.
+     */
+    public function getPatientAppointments(Request $request, Patient $patient): JsonResponse
+    {
+        $appointments = Appointment::with(['doctor'])
+            ->where('patient_id', $patient->id)
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
+        $events = $appointments->map(function ($appointment) {
+            return [
+                'id' => $appointment->id,
+                'title' => 'Dr. ' . $appointment->doctor->name,
+                'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->start_time->format('H:i:s'),
+                'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->end_time->format('H:i:s'),
+                'allDay' => false,
+                'backgroundColor' => $this->getStatusColor($appointment->status),
+                'borderColor' => $this->getStatusColor($appointment->status),
+                'textColor' => '#ffffff',
+                'extendedProps' => [
+                    'status' => $appointment->status,
+                    'type' => $appointment->type,
+                    'reason' => $appointment->reason
+                ]
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ]);
+    }
+
+    /**
+     * Get color based on appointment status
+     */
+    private function getStatusColor(string $status): string
+    {
+        return match($status) {
+            'confirmed' => '#28a745', // green
+            'pending' => '#ffc107',   // yellow
+            'cancelled' => '#dc3545', // red
+            'completed' => '#6c757d', // gray
+            default => '#007bff'      // blue
+        };
+    }
+
+    /**
      * Show the form for editing the specified appointment.
      */
     public function edit(Appointment $appointment): View

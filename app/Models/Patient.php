@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\Models\CyleHistory;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Patient extends Model
+class Patient extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +32,7 @@ class Patient extends Model
         'blood_type',
         'emergency_contact',
         'emergency_phone',
+        'passcode', 
     ];
 
     /**
@@ -39,6 +43,14 @@ class Patient extends Model
     protected $casts = [
         'date_of_birth' => 'date',
     ];
+
+    // Automatically hash the passcode when setting it
+    public function setPasscodeAttribute($value)
+    {
+        if ($value) {
+            $this->attributes['passcode'] = Hash::make($value);
+        }
+    }
 
     /**
      * Get the doctor that the patient belongs to.

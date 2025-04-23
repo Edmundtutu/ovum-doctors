@@ -82,8 +82,8 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="follow_up" class="form-label">Follow-up Recommendations</label>
-                        <textarea class="form-control" id="follow_up" name="follow_up" rows="2" placeholder="Note any follow-up needed"></textarea>
+                        <label for="follow_up_date" class="form-label">Follow-up Date</label>
+                        <input type="date" class="form-control" id="follow_up_date" name="follow_up_date" placeholder="Select a follow-up date">
                     </div>
                 </div>
                 <div class="modal-footer">
