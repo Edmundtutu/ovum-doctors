@@ -6,43 +6,94 @@ use App\Http\Controllers\Controller;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class PatientAuthController extends Controller
 {
     /**
      * Authenticate a patient and provide an API token
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'passcode' => 'required',
-            'device_name' => 'required',
+        // Validate request data
+        $validated = $request->validate([
+            'email' => 'sometimes|required_without:phoneNumber|email|max:255',
+            'passcode' => 'required|string|min:4',
+            'device_name' => 'required|string|max:255',
+            'phoneNumber' => 'sometimes|required_without:email|string|max:20'
         ]);
 
-        $patient = Patient::where('email', $request->email)->first();
+        try {
+            // Find patient by email or phone
+            $patient = $this->findPatient($validated);
+            
+            if (!$patient) {
+                throw ValidationException::withMessages([
+                    'email' => ['No account found with these credentials.'],
+                ]);
+            }
 
-        if (!$patient || !Hash::check($request->passcode, $patient->passcode)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
+            // Verify passcode
+            if (!Hash::check($validated['passcode'], $patient->passcode)) {
+                throw ValidationException::withMessages([
+                    'passcode' => ['The provided credentials are incorrect.'],
+                ]);
+            }
 
-        // Create a token with abilities based on the patient's permissions
-        $token = $patient->createToken($request->device_name, ['patient'])->plainTextToken;
+            // Create API token
+            $token = $patient->createToken($validated['device_name'], ['patient'])->plainTextToken;
 
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'patient' => [
+            // Prepare patient data
+            $patientData = [
                 'id' => $patient->id,
                 'name' => $patient->name,
                 'email' => $patient->email,
-                'doctor_name' => $patient->doctor->name,
-                // Add other patient fields that may be required.
-            ]
-        ]);
+                'phone' => $patient->phone,
+                'doctor_name' => optional($patient->doctor)->name,
+                // Add other relevant fields
+            ];
+
+            return response()->json([
+                'success' => true,
+                'token' => $token,
+                'patient' => $patientData
+            ]);
+
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Login error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during login. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Find patient by email or phone
+     * 
+     * @param array $credentials
+     * @return Patient|null
+     */
+    protected function findPatient(array $credentials): ?Patient
+    {
+        $query = Patient::query();
+        
+        if (!empty($credentials['email'])) {
+            return $query->where('email', $credentials['email'])->first();
+        }
+        
+        if (!empty($credentials['phoneNumber'])) {
+            return $query->where('phone', $credentials['phoneNumber'])->first();
+        }
+        
+        return null;
     }
 
     /**
