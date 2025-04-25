@@ -128,30 +128,24 @@ class CyleHistoryController extends Controller
         ]);
     }
 
-    /**
-     * Create new cycle history record
-     * 
-     * Validates and stores new cycle entry. Implements:
-     * - Strict validation rules for data integrity
-     * - Patient isolation through authenticated user binding
-     * - Automatic cycle_status setting to 'new'
-     * 
-     * @param Request $request HTTP request with cycle data
-     * @return JsonResponse 
-     *   - 422 Unprocessable Entity on validation failure
-     *   - 201 Created with new record on success
+     /**
+     * Create a new cycle history record.
+     *
+     * - Strict validation for data integrity.
+     * - Defaults to latest in-progress cycle values when fields are null.
+     * - Primarily used to store symptoms and explicit dates.
+     * - Marks every new record as 'in_progress'.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
-        // Validation rules definition:
-        // - month: YYYY-MM format required
-        // - cycle/period lengths: positive integers
-        // - dates: valid date formats when present
-        // - symptoms: array of strings when provided
+        // Validate inputs
         $validator = Validator::make($request->all(), [
             'month'             => 'required|date_format:Y-m',
-            'cycle_length'      => 'required|integer|min:1',
-            'period_length'     => 'required|integer|min:1',
+            'cycle_length'      => 'nullable|integer|min:1',
+            'period_length'     => 'nullable|integer|min:1',
             'symptoms'          => 'nullable|array',
             'symptoms.*'        => 'string|max:255',
             'cycle_start_date'  => 'nullable|date',
@@ -160,40 +154,62 @@ class CyleHistoryController extends Controller
             'cycle_end_date'    => 'nullable|date',
         ]);
 
-        // Early return on validation failure with detailed errors
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
-        // Get authenticated patient from request
+        //  Identify the current patient
         $patient = $request->user();
-        
-        // Create new CyleHistory instance with mass assignment
-        // Includes patient_id binding for data isolation
-        $cycle = new CyleHistory([
+
+        //  Get latest in-progress cycle for defaults
+        $latestCycle = CyleHistory::where('patient_id', $patient->id)
+            ->where('cycle_status', 'in_progress')
+            ->orderByDesc('created_at')
+            ->first();
+
+        //  Determine final values (request OR fallback to latest OR fixed default)
+        $cycleLength      = $request->input('cycle_length')
+                              ?? optional($latestCycle)->cycle_length
+                              ?? 28;
+        $periodLength     = $request->input('period_length')
+                              ?? optional($latestCycle)->period_length
+                              ?? 5;
+        $cycleStartDate   = $request->input('cycle_start_date')
+                              ?? optional($latestCycle)->cycle_start_date
+                              ?? null;
+        $periodStartDate  = $request->input('period_start_date')
+                              ?? optional($latestCycle)->period_start_date
+                              ?? null;
+        $periodEndDate    = $request->input('period_end_date')
+                              ?? optional($latestCycle)->period_end_date
+                              ?? null;
+        $cycleEndDate     = $request->input('cycle_end_date')
+                              ?? optional($latestCycle)->cycle_end_date
+                              ?? null;
+        $symptoms         = $request->input('symptoms') ?? [];
+
+        //  Create the record using mass assignment
+        $cycle = CyleHistory::create([
             'patient_id'        => $patient->id,
             'month'             => $request->month,
-            'cycle_length'      => $request->cycle_length,
-            'period_length'     => $request->period_length,
-            'symptoms'          => $request->symptoms,
-            'cycle_start_date'  => $request->cycle_start_date,
-            'period_start_date' => $request->period_start_date,
-            'period_end_date'   => $request->period_end_date,
-            'cycle_end_date'    => $request->cycle_end_date,
-            'cycle_status'      => 'in_progress', // Initial status state
+            'cycle_length'      => $cycleLength,
+            'period_length'     => $periodLength,
+            'symptoms'          => $symptoms,
+            'cycle_start_date'  => $cycleStartDate,
+            'period_start_date' => $periodStartDate,
+            'period_end_date'   => $periodEndDate,
+            'cycle_end_date'    => $cycleEndDate,
+            'cycle_status'      => 'in_progress',
         ]);
 
-        // Persist to database
-        $cycle->save();
-
-        // Success response with created record
+        //  Return success response
         return response()->json([
             'success' => true,
-            'message' => 'Cycle history created',
-            'data' => $cycle
+            'message' => 'Cycle history created successfully.',
+            'data'    => $cycle,
         ], 201);
     }
 

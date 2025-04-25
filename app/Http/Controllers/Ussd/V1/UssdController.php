@@ -11,14 +11,15 @@ class UssdController extends Controller
     /**
      * This controller has all th elogic of handling a user seesion on ussd 
      * From Authentication to parting
-    */
-    public function ussdRequestHandler(Request $request){
+     */
+    public function ussdRequestHandler(Request $request)
+    {
         $sessionId = $request['sessionId'];
         $serviceCode = $request['serviceCode'];
         $phoneNumber = $request['phoneNumber'];
         $text = $request['text'];
         header('Content-type: text/plain');
-        
+
         // Handle the USSD request here
         // You can use the sessionId, serviceCode, phoneNumber, and text to process the request
 
@@ -31,14 +32,14 @@ class UssdController extends Controller
             'response' => 'Your USSD response goes here'
         ]);
     }
-    
+
     /**
      * Function to handle authentication of the GSM user
      * 
      * Sends a Post request to The api route /api/patient/login
      * @param mixed $phone, $devicename, $passcode are required in the Request body
      * @return $token : bearer token for the logged in user
-    */ 
+     */
     public function login(string $phone, string $devicename, string $passcode)
     {
         return Http::async()->post('/api/patient/login', [
@@ -66,38 +67,18 @@ class UssdController extends Controller
     }
 
     /**
-     * Function to save a cycle-history of the ussd session
-     * 
-     * Makes a post request to the api route /api/cycle-history with Auth token in authorization header
-     * @param string $token, $month, $cycleLength, $periodLenth, $periodStartDate, 
-     * $periodEndDate, $cycleStartDate, $cycleEndDate, array $symptoms
-     * @return $response : response from the api 
-     */
-    protected function saveCycleHistory(
-        string $token,
-        string $month,
-        int $cycleLength,
-        int $periodLength,
-        string $periodStartDate,
-        string $periodEndDate,
-        string $cycleStartDate,
-        string $cycleEndDate,
-        array $symptoms
-    ) {
+     * Fucntion to get the cycle history of a patient for past 3 months
+    */
+    protected function getCycleHistory(){
+        $currentMonth = now()->format('Y-m-d');
+        $pastThreeMonths = now()->subMonths(3)->format('Y-m-d');
         try {
-            return Http::withToken($token)->post('/api/cycle-history', [
-            'month' => $month,
-            'cycle_length' => $cycleLength,
-            'period_length' => $periodLength,
-            'period_start_date' => $periodStartDate,
-            'period_end_date' => $periodEndDate,
-            'cycle_start_date' => $cycleStartDate,
-            'cycle_end_date' => $cycleEndDate,
-            'symptoms' => json_encode($symptoms)
+            return Http::get('api/cycle-histories', [
+                'month' => "{$currentMonth}-{$pastThreeMonths}"
             ]);
         } catch (\Exception $e) {
             return response()->json([
-            'message' => 'Failed to save cycle history: ' . $e->getMessage()
+                'message' => 'Failed to fetch cycle history: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -107,7 +88,7 @@ class UssdController extends Controller
         array $symptoms
     ) {
         try {
-            return Http::withToken($token)->post('/api/cycle-history/symptoms', [
+            return Http::withToken($token)->post('/api/cycle-history', [
                 'symptoms' => json_encode($symptoms)
             ]);
         } catch (\Exception $e) {
@@ -117,26 +98,30 @@ class UssdController extends Controller
         }
     }
 
-    protected function saveNewCycle(
+    protected function savePeriodStart(
         string $token,
-        string $month,
-        int $cycleLength,
-        int $periodLength,
-        string $cycleStartDate,
-        string $cycleEndDate
+        ?string $month, // month of recording the period start 
+        ?string $periodStartDate, // may be not be null if the period did not occur in the current month 
     ) {
         try {
-            return Http::withToken($token)->post('/api/cycle-history/new-cycle', [
+            return Http::withToken($token)->post('/api/cycle-history/start-period', [
                 'month' => $month,
-                'cycle_length' => $cycleLength,
-                'period_length' => $periodLength,
-                'cycle_start_date' => $cycleStartDate,
-                'cycle_end_date' => $cycleEndDate
+                'period_start_date' => $periodStartDate,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to save new cycle: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    protected function savePeriodEnd(){
+        try {
+            return Http::post('/api/cycle-history/end-period');
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to save period end: ' . $e->getMessage()
+            ], 500);
+        }        
     }
 }
