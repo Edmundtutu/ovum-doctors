@@ -127,7 +127,8 @@
                 </div>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newVisitModal">Add New
+                <button class="btn btn-custom-secondary me-2" data-bs-toggle="modal" data-bs-target="#newLabsRequestModal">Lab Request</button>
+                <button class="btn btn-custom-secondary me-2" data-bs-toggle="modal" data-bs-target="#newVisitModal">Add New
                     Visit</button>
                 <a href="{{ route('patients.edit', $patient) }}" class="btn btn-outline-primary">Edit Patient</a>
             </div>
@@ -147,6 +148,9 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#medications">Medications</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#labs">Labs</button>
         </li>
     </ul>
 
@@ -171,7 +175,7 @@
                 <div class="col-md-3">
                     <div class="vital-card card">
                         <div class="card-body">
-                            <div class="vital-icon bg-soft-primary text-primary">
+                            <div class="vital-icon bg-soft-primary text-primary-custom">
                                 <i class="fas fa-wave-square"></i>
                             </div>
                             <h6 class="text-muted mb-2">Heart Rate</h6>
@@ -355,10 +359,84 @@
                 </div>
             </div>
         </div>
+
+         <!-- Labs Tab -->
+        <div class="tab-pane fade" id="labs" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                    <h5 class="mb-0">Lab Results</h5>
+                    <div>
+                        <a href="{{ route('patients.labs.export-pdf', $patient) }}" class="btn btn-sm btn-outline-danger me-2">
+                            <i class="fas fa-file-pdf me-1"></i> Export as PDF
+                        </a>
+                        <a href="{{ route('patients.labs.export-csv', $patient) }}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-file-csv me-1"></i> Export as CSV
+                        </a>
+                        <button class="btn btn-sm btn-custom-secondary" data-bs-toggle="modal" data-bs-target="#newLabsRequestModal">
+                            <i class="fas fa-plus me-1"></i> Request New Labs
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Visit Date</th>
+                                    <th>Doctor</th>
+                                    <th>Key Metrics</th>
+                                    <th>Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($patient->labs as $lab)
+                                    <tr>
+                                        <td>{{ $lab->visit->visited_at ? $lab->visit->visited_at->format('Y-m-d') : 'N/A' }}</td>
+                                        <td>Dr. {{ $lab->visit->doctor->name }}</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <small class="text-secondary">FSH/LH: {{ $lab->fsh_lh_ratio }}</small>
+                                                <small class="text-secondary">BP: {{ $lab->bp_systolic }}/{{ $lab->bp_diastolic }}</small>
+                                                <small class="text-secondary">Follicles: {{ $lab->total_follicles }}</small>
+                                            </div>
+                                        </td>
+                                        <td>{{ $lab->updated_at->format('Y-m-d') }}</td>
+                                        <td>
+                                            <a href="{{ route('visits.labs.show', [$lab->visit, $lab]) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <a href="{{ route('visits.labs.edit', [$lab->visit, $lab]) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="fas fa-vial fa-2x mb-3 text-muted"></i>
+                                                <p class="mb-1">No lab results available for this patient.</p>
+                                                <button class="btn btn-sm btn-custom-secondary mt-2" data-bs-toggle="modal" data-bs-target="#newLabsRequestModal">
+                                                    Request Lab Tests
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- New Visit Modal -->
     @include('patients.partials.new-visit-modal')
+
+    <!-- Lab Request Modal -->
+    @include('patients.partials.new-labs-request-modal')
 @endsection
 @php
     if (isset($cycleHistory) && $cycleHistory->count() > 0) {

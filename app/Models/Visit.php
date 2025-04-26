@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Carbon;
 
@@ -61,6 +62,14 @@ class Visit extends Model
     public function vitals(): HasOne
     {
         return $this->hasOne(Vitals::class);
+    }
+
+    /**
+     * Get the lab results associated with the visit.
+     */
+    public function labs(): HasMany
+    {
+        return $this->hasMany(Lab::class);
     }
 
     /**

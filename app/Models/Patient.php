@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -90,6 +91,25 @@ class Patient extends Authenticatable
     public function vitals(): HasMany
     {
         return $this->hasMany(Vitals::class);
+    }
+
+    /**
+     * Get all lab results for the patient through visits.
+     */
+    public function labs(): HasManyThrough
+    {
+        return $this->hasManyThrough(Lab::class, Visit::class);
+    }
+
+    /**
+     * Get the latest visit with lab results for the patient.
+     */
+    public function latest_visit_with_labs(): HasOne
+    {
+        return $this->hasOne(Visit::class)
+            ->has('labs')
+            ->with('labs')
+            ->latest();
     }
 
     /**

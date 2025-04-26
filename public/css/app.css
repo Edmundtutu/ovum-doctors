@@ -96,7 +96,6 @@
 
 
 /* Custom Button Styles */
-
 .btn-custom-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -107,6 +106,42 @@
     background-color: var(--blend-primary-color);
     border-color: var(--primary-color);
     color: var(--primary-color);
+}
+
+.btn-custom-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-custom-secondary:hover {
+    background-color: rgba(255, 153, 204, 0.1);
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.btn-custom-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+}
+
+.btn-custom-warning:hover {
+    background-color: rgba(255, 153, 0, 0.1);
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+
+.btn-custom-danger {
+    background-color: var(--error-color);
+    border-color: var(--error-color);
+    color: white;
+}
+
+.btn-custom-danger:hover {
+    background-color: rgba(255, 55, 55, 0.1);
+    border-color: var(--error-color);
+    color: var(--error-color);
 }
 
 /* Toast Notifications */

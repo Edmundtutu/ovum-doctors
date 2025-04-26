@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\VisitController;
+use App\Http\Controllers\LabController;
 use App\Http\Controllers\APi\CyleHistoryController;
 
 
@@ -37,6 +38,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/patient-access/verify', [LoginController::class, 'verifyPatientAccess'])->name('patient.access.verify');
     Route::get('patients/{patient}/appointments', [AppointmentController::class, 'getPatientAppointments'])->name('patients.appointments');
     Route::resource('visits', VisitController::class);
+    
+    // Nested Lab resources under Visits
+    Route::resource('visits.labs', LabController::class);
+    
+    // Convenience routes for lab actions from patient context
+    Route::get('patients/{patient}/labs', [LabController::class, 'index'])->name('patients.labs.index');
+    Route::get('patients/{patient}/labs/create', [LabController::class, 'create'])->name('patients.labs.create');
+    Route::get('patients/{patient}/labs/export-csv', [LabController::class, 'exportCsv'])->name('patients.labs.export-csv');
+    Route::get('patients/{patient}/labs/export-pdf', [LabController::class, 'exportPdf'])->name('patients.labs.export-pdf');
+    Route::get('visits/{visit}/labs/{lab}/export-pdf', [LabController::class, 'exportLabPdf'])->name('visits.labs.export-pdf');
+    
     Route::get('patients/{patient}/cycle-history', [CyleHistoryController::class, 'forPatient'])
         ->name('patients.cycle-history');
 }); 
