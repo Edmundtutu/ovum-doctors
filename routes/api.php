@@ -30,6 +30,8 @@ Route::post('/patient/login', [PatientAuthController::class, 'login']);
 //Ussd Routes
 Route::prefix('ussd')->group(function () {
     Route::post('/', [UssdController::class, 'ussdRequestHandler']);
+    // routes for testing
+    Route::post('/login', [UssdController::class, 'loginRequest']);
 });
 
 // Protected routes - require authentication
