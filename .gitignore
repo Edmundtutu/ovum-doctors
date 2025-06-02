@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/mobile
 /storage/*.key
 /storage/pail
 /vendor
@@ -21,3 +22,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/database/db_alter.sql
+/download.php

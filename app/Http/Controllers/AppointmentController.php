@@ -17,9 +17,10 @@ class AppointmentController extends Controller
      */
     public function index(): View
     {
-        $appointments = Appointment::with(['patient', 'doctor'])
-            ->upcoming()
-            ->paginate(10);
+        // $appointments = Appointment::with(['patient', 'doctor']) // for testing and dev we shall only retun all appointments 
+        $appointments = Appointment::all();
+            // ->upcoming()
+            // ->paginate(10);
 
         return view('appointments.index', compact('appointments'));
     }
