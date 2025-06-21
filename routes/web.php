@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\DashboardController;
@@ -12,8 +14,12 @@ use App\Http\Controllers\LabController;
 use App\Http\Controllers\APi\CyleHistoryController;
 
 
-
-Route::redirect('/', '/dashboard')->middleware('auth');
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect('/dashboard');
+    }
+    return view('welcome'); // guest welcome page
+});
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -52,4 +58,3 @@ Route::middleware('auth')->group(function () {
     Route::get('patients/{patient}/cycle-history', [CyleHistoryController::class, 'forPatient'])
         ->name('patients.cycle-history');
 }); 
-

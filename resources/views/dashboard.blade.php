@@ -23,47 +23,6 @@
             </button>
         </div>
     </div>
-    {{-- {{dd($todayAppointments, $appointmentIncrease, $completedAppointments, $completionRate, $pendingAppointments, $nextAppointmentIn, $cancelledAppointments, $todayPatients, $calendarEvents)}} --}}
-    <!-- Stats Cards -->
-    {{-- <div class="row g-3 mb-3">
-        <div class="col-md-3">
-            <div class="card stats-card bg-primary text-white">
-                <div class="card-body">
-                    <h6 class="card-subtitle">Today's Appointments</h6>
-                    <h2 class="card-title mb-2">{{ $todayAppointments }}</h2>
-                    <p class="card-text"><i class="fas fa-arrow-up me-1"></i>{{ $appointmentIncrease }}%
-                        increase</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-success text-white">
-                <div class="card-body">
-                    <h6 class="card-subtitle">Completed</h6>
-                    <h2 class="card-title mb-2">{{ $completedAppointments }}</h2>
-                    <p class="card-text">{{ $completionRate }}% of daily target</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-info text-white">
-                <div class="card-body">
-                    <h6 class="card-subtitle">Pending</h6>
-                    <h2 class="card-title mb-2">{{ $pendingAppointments }}</h2>
-                    <p class="card-text">Next in {{ $nextAppointmentIn }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-warning text-white">
-                <div class="card-body">
-                    <h6 class="card-subtitle">Cancelled</h6>
-                    <h2 class="card-title mb-2">{{ $cancelledAppointments }}</h2>
-                    <p class="card-text">Today's cancellations</p>
-                </div>
-            </div>
-        </div>
-    </div> --}}
     <div class="stats-grid">
         <!-- 1) Appointment Today -->
         <div class="stats-card bg-danger text-white">

@@ -24,3 +24,4 @@ yarn-error.log
 /.zed
 /database/db_alter.sql
 /download.php
+/public/download.php
